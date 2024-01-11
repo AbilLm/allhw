@@ -1,6 +1,8 @@
-from aiogram import Router, F, types
+from aiogram import Router, F, types, Bot
 from aiogram.filters import Command
+from db.queries import get_catalog, init_db, get_object
 
+get_catalog_router = Router()
 catalog_router = Router()
 
 @catalog_router.message(Command("catalog"))
@@ -56,3 +58,13 @@ async def show_book(message: types.Message):
         ])
 
     await message.answer("Перед новым годом всегда есть скидка на быт.технику.Ты знаешь где покупать!", reply_markup=kb)
+
+@get_catalog_router.message(Command('clothes', 'books', 'dish'))
+async def show_my_products(message: types.Message):
+   objects = get_object(1 if message.text=='clothes' else 2 if message.text=='books' else 3)
+   for i in objects:
+       await message.answer(
+                              text=f'id{i[0]}\n'
+                                   f"name{i[1]}\n"
+                                   f"amount{i[2]}")
+
